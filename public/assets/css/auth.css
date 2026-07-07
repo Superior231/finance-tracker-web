@@ -1,0 +1,192 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #188655;
+    --primary-color-opacity: #d1e6dd;
+    --soft-green: #EAF6F1;
+    --secondary-color: #EAF6F1;
+    --background-color: #FEFEFF;
+    --background-input: var(--soft-green);
+    --text-color: #202429;
+    --input-color: #ACACAC;
+
+    --nav-color: #f8f9fa;
+
+    /* Transisi */
+    --tran-02: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.4s ease;
+    --tran-05: all 0.5s ease;
+}
+
+
+/* Loading Screen */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+#loading-screen.fade-out {
+    animation: fadeOut 3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--tran-05);
+}
+
+
+
+/* Colors */
+a {
+    color: var(--primary-color) !important;
+}
+
+.primary-color {
+    color: var(--primary-color) !important;
+}
+
+.text-color,
+label {
+    color: var(--text-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.bg-color {
+    background-color: var(--background-color) !important;
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+.btn-close {
+    border-color: var(--text-color) !important;
+}
+
+/* Colors End */
+
+
+
+/* Text Size */
+h1 {
+    font-size: clamp(30px, 2.5vw, 35px);
+}
+
+h2 {
+    font-size: clamp(25px, 2.5vw, 30px);
+}
+
+h3 {
+    font-size: clamp(20px, 2.5vw, 25px);
+}
+
+h4 {
+    font-size: clamp(17px, 2.5vw, 20px);
+}
+
+h5 {
+    font-size: clamp(15px, 2.5vw, 17px);
+}
+
+h6,
+a,
+span,
+p {
+    font-size: clamp(13px, 2.5vw, 15px);
+}
+
+small,
+.fs-7 {
+    font-size: clamp(8px, 2.5vw, 13px) !important;
+}
+
+/* Text Size End */
+
+
+.logo {
+    margin-left: 30px;
+}
+
+.pass-logo {
+    position: absolute;
+    height: 35px;
+    width: 38px;
+    background: transparent;
+    line-height: 60px;
+    font-size: 20px;
+    text-align: center;
+    padding-left: 15px;
+    z-index: 999;
+}
+
+.content .pass-logo i.bx,
+.showPass {
+    color: var(--input-color);
+    position: relative;
+}
+
+.content input {
+    height: 100%;
+    width: 100%;
+    border: 1px solid var(--background-input);
+    color: var(--text-color);
+    border-radius: 10px;
+    padding: 15px 10px 15px 45px;
+    outline: none;
+    background: var(--background-input);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content input::placeholder {
+    color: var(--input-color);
+}
+
+input.form-control:focus,
+input.form-control:-webkit-autofill {
+    box-shadow: none;
+    border-color: var(--primary-color) !important;
+    background: var(--background-input) !important;
+    color: var(--text-color) !important;
+}
+
+form .btn {
+    border-radius: 10px !important;
+    padding: 10px 15px;
+}
+
+#hero {
+    background-color: var(--soft-green) !important;
+}
+
+@media (max-width: 767px) {
+    #hero {
+        display: none !important;
+    }
+
+    #logo-mobile {
+        display: flex !important;
+    }
+}
