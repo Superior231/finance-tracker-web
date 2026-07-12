@@ -190,3 +190,7 @@ form .btn {
         display: flex !important;
     }
 }
+
+.toast.show {
+    background-color: var(--background-color);
+}

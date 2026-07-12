@@ -5,7 +5,7 @@
         <div class="col col-12 col-md-6 col-lg-7 d-flex flex-column justify-content-center" id="hero">
             <a href="" class="gap-2 logo d-flex align-items-center justify-content-start ms-5 text-decoration-none">
                 <img src="{{ url('assets/img/logo.png') }}" alt="Logo" style="width: 30px; height: auto;">
-                <h4 class="py-0 my-0 text-center text-color fw-bold">Finance Tracker</h4>
+                <h4 class="py-0 my-0 text-center text-success fw-bold">Finance Tracker</h4>
             </a>
             <div class="d-flex justify-content-center">
                 <img src="{{ url('assets/img/hero2.gif') }}" alt="Register" style="width: 80%; height: auto;">
