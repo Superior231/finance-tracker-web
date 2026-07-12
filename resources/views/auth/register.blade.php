@@ -117,7 +117,7 @@
                     </form>
                 </div>
                 <div class="py-5 footer d-flex justify-content-center" style="height: 20px">
-                    <small class="text-secondary">Copyright &copy;{{ date('Y') }} <a href="https://hikmalfalah.page.gd" class="fs-7" target="_blank">Hikmal Falah</a>. All rights reserved.</small>
+                    <small class="text-secondary">Copyright &copy;{{ date('Y') }} <a href="https://hikmalfalah.page.gd" class="fs-7 text-decoration-none" target="_blank">Hikmal Falah</a>. All rights reserved.</small>
                 </div>
             </div>
         </div>
