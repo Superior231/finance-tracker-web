@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::withCount('transactions')->get();
+        $user = Auth::user();
+        $categories = Category::withCount('transactions')->where('user_id', $user->id)->get();
         $types = Category::select('type')
                      ->distinct()
                      ->whereNotNull('type')
@@ -36,7 +38,14 @@ class CategoryController extends Controller
             'name.unique'   => 'The category name has already been taken.',
         ]);
 
-        $category = Category::create($request->only('type', 'name'));
+        if ($request->has('user_id') && (int) $request->user_id !== Auth::id()) {
+            return redirect()->route('categories.index')->with('error', 'Oops... Something went wrong!');
+        }
+
+        $data = $request->only('type', 'name');
+        $data['user_id'] = Auth::id();
+
+        $category = Category::create($data);
 
         if ($category) {
             return redirect()->route('categories.index')->with('success', 'Category created successfully!');
@@ -47,6 +56,10 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
+        if ($category->user_id !== Auth::id() || ($request->has('user_id') && (int)$request->user_id !== Auth::id())) {
+            return redirect()->route('categories.index')->with('error', 'Oops... Something went wrong!');
+        }
+
         $request->validate([
             'type' => 'required|in:income,expense',
             'name' => 'unique:categories|required|string|max:255',
@@ -56,6 +69,11 @@ class CategoryController extends Controller
             'name.required' => 'The category name is required.',
             'name.unique'   => 'The category name has already been taken.',
         ]);
+
+        // Cek apakah pengguna yang terautentikasi adalah pemilik dari data yang ingin diperbarui
+        if (Auth::id() !== (int) Auth::user()->id) {
+            return redirect()->route('profile.index')->with('error', 'Oops... Something went wrong!');
+        }
 
         $category->update($request->only('type', 'name'));
 
@@ -68,6 +86,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        if ($category->user_id !== Auth::id()) {
+            return redirect()->route('categories.index')->with('error', 'Oops... Something went wrong!');
+        }
+
         if ($category->transactions()->count() > 0) {
             return redirect()->route('categories.index')->with('error', 'Category cannot be deleted because it has transaction!.');
         }

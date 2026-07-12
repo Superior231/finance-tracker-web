@@ -52,7 +52,7 @@
                                     <td>{{ Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y, H:i') }} WIB</td>
                                     <td>
                                         <div class="gap-2 actions d-flex align-items-center justify-content-center pe-3">
-                                            <button class="p-2 rounded-05 btn btn-primary d-flex align-items-center justify-content-center" onclick="editCategory('{{ $item->id }}', '{{ $item->type }}', '{{ $item->name }}')" data-bs-toggle="modal" data-bs-target="#edit-kategori-modal">
+                                            <button class="p-2 rounded-05 btn btn-primary d-flex align-items-center justify-content-center" onclick="editCategory('{{ $item->id }}', '{{ Auth::user()->id }}', '{{ $item->type }}', '{{ $item->name }}')" data-bs-toggle="modal" data-bs-target="#edit-kategori-modal">
                                                 <i class='p-0 m-0 bx bxs-pencil'></i>
                                             </button>
                                             <form id="delete-category-form-{{ $item->id }}" action="{{ route('categories.destroy', $item->id) }}" method="POST">
@@ -160,7 +160,8 @@
                 }
             });
     
-            function editCategory(category, type, name) {
+            function editCategory(category, user_id, type, name) {
+                $('#edit-user_id').val(user_id);
                 $('#edit-type').val(type);
                 $('#edit-name').val(name);
     
