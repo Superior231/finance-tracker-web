@@ -58,14 +58,14 @@
                         </x-dropdown-link>
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
+                        <x-dropdown-link :href="route('logout')"
+                            id="logout-confirmaton"
+                            onclick="event.preventDefault(); logout();">
+                            {{ __('Log Out') }}
+                        </x-dropdown-link>
+                        
+                        <form id="logout-form" method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
@@ -123,16 +123,41 @@
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
+                <x-responsive-nav-link :href="route('logout')"
+                    id="logout-confirmaton"
+                    onclick="event.preventDefault(); logout();">
+                    {{ __('Log Out') }}
+                </x-responsive-nav-link>
+                
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="d-none">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
                 </form>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+    function logout() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Are You Sure?',
+            text: 'Are you sure you want to logout?',
+            showCancelButton: true,
+            confirmButtonText: 'Logout',
+            customClass: {
+                popup: 'sw-popup',
+                title: 'sw-title',
+                htmlContainer: 'sw-text',
+                icon: 'border-success text-success',
+                closeButton: 'bg-secondary border-0 shadow-none',
+                confirmButton: 'bg-danger border-0 shadow-none',
+            },
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logout-form').submit();
+            }
+        });
+    }
+</script>

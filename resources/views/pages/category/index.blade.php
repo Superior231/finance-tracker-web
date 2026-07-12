@@ -183,7 +183,7 @@
                         popup: 'sw-popup',
                         title: 'sw-title',
                         htmlContainer: 'sw-text',
-                        icon: 'sw-icon border-red-300',
+                        icon: 'border-success text-success',
                         closeButton: 'bg-secondary border-0 shadow-none',
                         confirmButton: 'bg-danger border-0 shadow-none',
                     },
