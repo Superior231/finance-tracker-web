@@ -6,18 +6,18 @@
 
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+            <h2 class="text-xl font-bold leading-tight text-gray-800">
                 {{ $navTitle }}
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="card">
+    <div class="py-2 mx-auto px-6 max-w-7xl lg:px-8">
+        <div class="card shadow-sm">
             <div class="p-3 card-body p-lg-4">
                 <div class="actions d-flex justify-content-between align-items-center">
                     <h4 class="py-0 my-0 fw-bold">All Categories</h4>
-                    <button class="gap-1 px-4 py-2 text-light btn btn-primary d-flex align-items-center rounded-pill" data-bs-toggle="modal" data-bs-target="#tambah-kategori-modal">
+                    <button class="gap-1 px-4 py-2 text-light btn btn-primary d-flex align-items-center rounded-10" data-bs-toggle="modal" data-bs-target="#tambah-kategori-modal">
                         <i class='bx bx-plus fs-5'></i>
                         Create
                     </button>
