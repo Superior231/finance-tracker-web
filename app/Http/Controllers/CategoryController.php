@@ -29,9 +29,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $userId = Auth::id();
         $request->validate([
             'type' => 'required|in:income,expense',
-            'name' => 'unique:categories|required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories')->where(function ($query) use ($userId) {
+                    return $query->where('user_id', $userId);
+                })
+            ],
         ], [
             'type.required' => 'The category type is required.',
             'type.in'       => 'The category type is invalid.',
@@ -57,6 +65,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
+        $userId = Auth::id();
         if ($category->user_id !== Auth::id() || ($request->has('user_id') && (int)$request->user_id !== Auth::id())) {
             return redirect()->route('categories.index')->with('error', 'Oops... Something went wrong!');
         }
@@ -67,7 +76,9 @@ class CategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('categories', 'name')->ignore($category->id),
+                Rule::unique('categories')->where(function ($query) use ($userId) {
+                    return $query->where('user_id', $userId);
+                })->ignore($category->id),
             ],
         ], [
             'type.required' => 'The category type is required.',
