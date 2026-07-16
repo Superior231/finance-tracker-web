@@ -21,7 +21,6 @@ class CategoryController extends Controller
         return view('pages.category.index', [
             'title' => 'Categories - Finance Tracker',
             'navTitle' => 'Categories',
-            'active' => 'categories',
             'categories' => $categories,
             'types' => $types
         ]);

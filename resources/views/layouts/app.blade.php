@@ -32,6 +32,8 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @include('layouts.navigation-bottom')
         </div>
 
         <x-footer />
