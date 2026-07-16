@@ -27,19 +27,19 @@
                 <div class="pb-5 table-responsive">
                     <table class="table table-striped table-hover" id="myDataTable">
                         <thead>
-                            <tr>
+                            <tr class="text-sm md:text-base">
                                 <th>Category</th>
                                 <th class="text-center">Type</th>
-                                <th>Updated at</th>
-                                <th>Created at</th>
+                                <th class="hidden md:table-cell">Updated at</th>
+                                <th class="hidden md:table-cell">Created at</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($categories as $item)
                                 <tr class="align-middle">
-                                    <td>{{ $item->name }}</td>
-                                    <td>
+                                    <td class="text-xs md:text-base">{{ $item->name }}</td>
+                                    <td class="text-xs md:text-base">
                                         <div class="type-info d-flex align-items-center justify-content-center pe-3">
                                         @if ($item->type == 'income')
                                             <span class="badge rounded-pill bg-success">{{ $item->type }}</span>
@@ -48,8 +48,12 @@
                                         @endif
                                     </div>
                                     </td>
-                                    <td>{{ Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y, H:i') }} WIB</td>
-                                    <td>{{ Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y, H:i') }} WIB</td>
+                                    <td class="hidden md:table-cell">
+                                        {{ Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y, H:i') }} WIB
+                                    </td>
+                                    <td class="hidden md:table-cell">
+                                        {{ Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y, H:i') }} WIB
+                                    </td>
                                     <td>
                                         <div class="gap-2 actions d-flex align-items-center justify-content-center pe-3">
                                             <button class="p-2 rounded-05 btn btn-primary d-flex align-items-center justify-content-center" onclick="editCategory('{{ $item->id }}', '{{ Auth::user()->id }}', '{{ $item->type }}', '{{ $item->name }}')" data-bs-toggle="modal" data-bs-target="#edit-kategori-modal">
@@ -58,7 +62,7 @@
                                             <form id="delete-category-form-{{ $item->id }}" action="{{ route('categories.destroy', $item->id) }}" method="POST">
                                                 @csrf @method('DELETE')
             
-                                                <button type="button" class="p-2 rounded btn btn-danger d-flex align-items-center justify-content-center" onclick="confirmDeleteCategory({{ $item->id }})">
+                                                <button type="button" class="p-2 rounded-05 btn btn-danger d-flex align-items-center justify-content-center" onclick="confirmDeleteCategory({{ $item->id }})">
                                                     <i class='p-0 m-0 bx bxs-trash'></i>
                                                 </button>
                                             </form>

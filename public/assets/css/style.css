@@ -209,7 +209,15 @@ thead tr th {
     border-color: #dee1e6 !important;
 }
 
+.paginate_button.page-item.previous .page-link,
+.paginate_button.page-item.next .page-link {
+    box-shadow: none !important;
+}
+.paginate_button.page-item .page-link {
+    color: var(--primary-color) !important;
+}
 .paginate_button.page-item.active .page-link {
+    color: var(--text-color-light) !important;
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
     box-shadow: none !important;
