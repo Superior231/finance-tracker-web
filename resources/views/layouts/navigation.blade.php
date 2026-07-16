@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 position-sticky sticky-top">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -159,5 +159,21 @@
                 document.getElementById('logout-form').submit();
             }
         });
+    }
+
+    try {
+        const navbar = document.querySelector("nav");
+        const classList = ["shadow-sm"];
+
+        if (navbar) {
+            const handleScroll = () => {
+                const action = window.pageYOffset > 0 ? 'add' : 'remove';
+                if (navbar) navbar.classList[action](...classList);
+            };
+
+            window.addEventListener("scroll", handleScroll);
+        }
+    } catch (error) {
+        console.log("Navbar not found!");
     }
 </script>
