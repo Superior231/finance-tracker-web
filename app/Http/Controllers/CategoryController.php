@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
@@ -63,12 +62,7 @@ class CategoryController extends Controller
 
         $request->validate([
             'type' => 'required|in:income,expense',
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('categories', 'name')->ignore($category->id),
-            ],
+            'name' => 'unique:categories|required|string|max:255',
         ], [
             'type.required' => 'The category type is required.',
             'type.in'       => 'The category type is invalid.',
