@@ -20,8 +20,7 @@ class GoogleLoginController extends Controller
     public function handleGoogleCallback()
     {
         if (request()->has('error') || !request()->has('code')) {
-            return redirect()->route('login')
-                ->with('error', 'Authentication with Google was cancelled.');
+            return $this->redirectToGoogle();
         }
 
         try {
