@@ -28,8 +28,8 @@
                 </span>
             </a>
         </li>
-        <li class="list {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-            <a href="{{ route('profile.edit') }}" title="Profile">
+        <li class="list {{ request()->routeIs('profile.index') ? 'active' : '' }}">
+            <a href="{{ route('profile.index') }}" title="Profile">
                 <span class="icon">
                     <i class='bx bxs-user icon'></i>
                 </span>

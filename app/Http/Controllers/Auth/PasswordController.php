@@ -20,10 +20,19 @@ class PasswordController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        $request->user()->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        try {
+            $updated = $request->user()->update([
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        return back()->with('status', 'password-updated');
+            if ($updated) {
+                return redirect()->route('profile.index')->with('success', 'Password updated successfully!');
+            } else {
+                return redirect()->route('profile.index')->with('error', 'Failed to update password!');
+            }
+            
+        } catch (\Exception $e) {
+            return redirect()->route('profile.index')->with('error', 'Oops... Something went wrong!');
+        }
     }
 }

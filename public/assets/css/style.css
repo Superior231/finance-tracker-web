@@ -12,13 +12,17 @@
     --soft-green: #EAF6F1;
     --secondary-color: #EAF6F1;
     --background-color: #FEFEFF;
-    --background-input: var(--soft-green);
-    --text-color: #202429;
-    --text-color-light: #fff;
     --input-color: #ACACAC;
-
+    --background-input: var(--soft-green);
     --nav-color: #f8f9fa;
     --nav-bottom-icon-color: #f6f5ff;
+
+    /* Text Color */
+    --text-color: #202429;
+    --text-color-light: #fff;
+    --text-color-muted: var(--input-color);
+    --text-color-muted-2: #6d757f;
+    --text-color-danger: #dd3445;
 
     /* Transisi */
     --tran-02: all 0.2s ease;
@@ -48,6 +52,19 @@ a:hover {
 
 .text-green-500 {
     color: var(--primary-color) !important;
+}
+
+.text-color {
+    color: var(--text-color) !important;
+}
+.text-color-muted {
+    color: var(--text-color-muted) !important;
+}
+.text-color-muted-2 {
+    color: var(--text-color-muted-2) !important;
+}
+.text-color-danger {
+    color: var(--text-color-danger) !important;
 }
 
 .btn-primary,
@@ -86,7 +103,7 @@ a:hover {
 
 /* Card */
 .card {
-    border-radius: 1rem !important;
+    border-radius: var(--radius-20) !important;
     border: none !important;
     box-shadow: none !important;
 }
@@ -191,6 +208,44 @@ a:hover {
 
 
 
+
+/* Profile */
+section.profile .actions .card {
+    border: 1px solid transparent !important;
+}
+section.profile .actions .card.delete-account {
+    border: none !important;
+    background-color: var(--text-color-danger) !important;
+    color: var(--text-color-light) !important;
+}
+section.profile .actions .card:nth-child(1):hover,
+section.profile .actions .card:nth-child(2):hover {
+    border-color: var(--primary-color) !important;
+    transition: var(--tran-05) !important;
+}
+section.profile .actions .logout:hover {
+    border-color: var(--text-color-danger) !important;
+    transition: var(--tran-05) !important;
+}
+
+section.profile .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+section.profile .user-info .profile-image {
+    width: 120px;
+    height: 120px;
+}
+section.profile .actions .card-body {
+    padding: 25px 20px !important;
+}
+
+
+
+
 /* DataTables */
 .dataTables_filter .form-control,
 .dataTables_length .form-select {
@@ -233,15 +288,33 @@ thead tr th {
 /* Modal */
 .modal-content,
 .swal2-popup {
-    border-radius: 1rem !important;
+    border-radius: var(--radius-20) !important;
     border: none !important;
     box-shadow: none !important;
+}
+#edit-profile .modal-body .profile-image {
+    width: 80px;
+    height: 80px;
+}
+#edit-profile .modal-content .delete-avatar-btn form button {
+    position: absolute;
+    z-index: 9999;
+    top: 57px;
+    right: 0;
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    background-color: var(--soft-green);
+    color: var(--text-color-danger);
+    font-weight: 600;
+    cursor: pointer !important;
 }
 
 
 /* Toasts */
 .toast {
     animation: fadeInOut 1s ease-in-out;
+    border-radius: var(--radius-10) !important;
 }
 @keyframes fadeInOut {
     0% {
@@ -266,9 +339,6 @@ thead tr th {
     padding: 5px;
     background-color: var(--background-color);
     display: block;
-}
-.toast .toast-body {
-    border-radius: 0px 0px 10px 10px;
 }
 @media (max-width: 768px) {
     .toast.show {

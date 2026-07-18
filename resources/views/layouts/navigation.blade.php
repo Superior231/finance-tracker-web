@@ -26,7 +26,7 @@
                     <x-slot name="trigger">
                         <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border-0 border-transparent rounded-md hover:text-gray-700 focus:outline-none">
                             
-                            <div class="profile-image w-8 h-8 overflow-hidden rounded-full flex items-center justify-center bg-gray-200">
+                            <div class="flex items-center justify-center w-8 h-8 overflow-hidden bg-gray-200 rounded-full profile-image">
                                 @if (!empty(Auth::user()->avatar))
                                     <img class="object-cover w-full h-full img" src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}">
                                 @elseif (!empty(Auth::user()->avatar_google))
@@ -49,7 +49,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.index')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
