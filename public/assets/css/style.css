@@ -218,8 +218,8 @@ section.profile .actions .card.delete-account {
     background-color: var(--text-color-danger) !important;
     color: var(--text-color-light) !important;
 }
-section.profile .actions .card:nth-child(1):hover,
-section.profile .actions .card:nth-child(2):hover {
+section.profile .actions .card.edit-profile:hover,
+section.profile .actions .card.change-password:hover {
     border-color: var(--primary-color) !important;
     transition: var(--tran-05) !important;
 }

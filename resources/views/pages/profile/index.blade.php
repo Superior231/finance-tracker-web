@@ -29,18 +29,22 @@
             </div>
 
             <div class="gap-2 col-12 col-md-8 d-flex flex-column actions">
-                <a href="#" class="p-0 shadow-sm card" data-bs-toggle="modal" data-bs-target="#edit-profile">
+                <a href="#" class="p-0 shadow-sm card edit-profile" data-bs-toggle="modal" data-bs-target="#edit-profile">
                     <div class="gap-2 card-body d-flex align-items-center">
                         <i class='bx bx-user fs-4'></i>
                         <span class="font-semibold">Edit profile</sp>
                     </div>
                 </a>
-                <a href="#" class="p-0 shadow-sm card" data-bs-toggle="modal" data-bs-target="#change-password">
-                    <div class="gap-2 card-body d-flex align-items-center">
-                        <i class='bx bx-lock-alt fs-4'></i>
-                        <span class="font-semibold">Change password</sp>
-                    </div>
-                </a>
+
+                @if (empty(Auth::user()->avatar_google))
+                    <a href="#" class="p-0 shadow-sm card change-password" data-bs-toggle="modal" data-bs-target="#change-password">
+                        <div class="gap-2 card-body d-flex align-items-center">
+                            <i class='bx bx-lock-alt fs-4'></i>
+                            <span class="font-semibold">Change password</sp>
+                        </div>
+                    </a>
+                @endif
+
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); logout();" class="p-0 shadow-sm card logout">
                     <div class="gap-2 card-body d-flex align-items-center text-danger">
                         <i class='bx bx-arrow-from-left fs-3'></i>
