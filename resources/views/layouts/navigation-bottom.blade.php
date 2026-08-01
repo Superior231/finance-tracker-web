@@ -17,7 +17,7 @@
         <li class="list {{ request()->routeIs('transactions.create') ? 'active' : '' }}">
             <a href="{{ route('transactions.create') }}" title="Create Transactions">
                 <span class="icon">
-                    <i class='bx bx-qr-scan icon'></i>
+                    <i class='bx bx-plus icon'></i>
                 </span>
             </a>
         </li>
