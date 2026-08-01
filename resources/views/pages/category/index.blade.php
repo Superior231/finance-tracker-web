@@ -13,8 +13,8 @@
     </x-slot>
 
     <div class="py-2 mx-auto px-6 max-w-7xl lg:px-8">
-        <div class="card shadow-sm">
-            <div class="p-3 card-body p-lg-4">
+        <div class="card shadow-sm mb-5">
+            <div class="card-body p-3 p-lg-4">
                 <div class="actions d-flex justify-content-between align-items-center">
                     <h4 class="py-0 my-0 fw-bold">All Categories</h4>
                     <button class="gap-1 px-4 py-2 text-light btn btn-primary d-flex align-items-center rounded-10" data-bs-toggle="modal" data-bs-target="#tambah-kategori-modal">

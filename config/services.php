@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'parser' => [
+        'url' => env('API_URL'),
+    ],
+
 ];

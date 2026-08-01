@@ -15,9 +15,43 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    
                     <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.index')">
                         {{ __('Categories') }}
                     </x-nav-link>
+
+                    <!-- Dropdown Transactions -->
+                    @php
+                        $isActive = request()->routeIs('transactions.*');
+                        $classes = $isActive
+                            ? 'inline-flex items-center px-1 pt-1 border-b-2 border-green-400 text-sm font-medium leading-5 text-green-700 focus:outline-none focus:border-green-700 transition duration-150 ease-in-out cursor-pointer'
+                            : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out cursor-pointer';
+                    @endphp
+
+                    <div class="{{ $classes }}">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button class="flex items-center focus:outline-none">
+                                    <div>{{ __('Transactions') }}</div>
+
+                                    <div class="ms-1">
+                                        <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')">
+                                    {{ __('Create Transaction') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')">
+                                    {{ __('All Transactions') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
                 </div>
             </div>
 

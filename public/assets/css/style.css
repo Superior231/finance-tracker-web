@@ -67,13 +67,16 @@ a:hover {
     color: var(--text-color-danger) !important;
 }
 
-.btn-primary,
-.btn-primary:active,
-.btn-primary:focus,
-.btn-primary:hover {
+.btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
     box-shadow: none !important;
+}
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary:hover {
+    background-color: #105032 !important;
+    border-color: #105032 !important;
 }
 .border-primary {
     border-color: var(--primary-color) !important;

@@ -14,8 +14,8 @@
                 </span>
             </a>
         </li>
-        <li class="list">
-            <a href="" title="Create Transactions">
+        <li class="list {{ request()->routeIs('transactions.create') ? 'active' : '' }}">
+            <a href="{{ route('transactions.create') }}" title="Create Transactions">
                 <span class="icon">
                     <i class='bx bx-qr-scan icon'></i>
                 </span>
