@@ -13,38 +13,41 @@
         </x-slot>
 
         <div class="max-w-5xl px-6 py-2 mx-auto lg:px-8">
-            <div class="card shadow-sm mb-5">
-                <div class="card-body p-3 p-lg-4">
+            <div class="mb-5 shadow-sm card">
+                <div class="p-3 card-body p-lg-4">
                     <!-- TYPE TOGGLE -->
                     <div class="flex p-1 bg-gray-100 rounded-xl w-100">
                         <button type="button" @click="type='expense'"
                             :class="type === 'expense' ? 'bg-green-100 text-gray-900 border-green-300' :
                                 'text-gray-600 hover:text-gray-700 border-transparent'"
                             class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium border rounded-xl w-100">
-                            <i class='bx bx-trending-down fs-5 py-0 my-0'></i>
+                            <i class='py-0 my-0 bx bx-trending-down fs-5'></i>
                             <span>Expense</span>
                         </button>
                         <button type="button" @click="type='income'"
                             :class="type === 'income' ? 'bg-green-100 text-gray-900 border-green-300' :
                                 'text-gray-600 hover:text-gray-700 border-transparent'"
                             class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium border rounded-xl w-100">
-                            <i class='bx bx-trending-up fs-5 py-0 my-0'></i>
+                            <i class='py-0 my-0 bx bx-trending-up fs-5'></i>
                             <span>Income</span>
                         </button>
                     </div>
 
                     <div class="mt-6">
                         <form method="POST" action="{{ route('transactions.store') }}" enctype="multipart/form-data"
-                            class="space-y-6" id="form" @receipt-selected="autoParseReceipt($event.detail.file)">
+                            class="space-y-6" id="form" @receipt-selected="autoParseReceipt($event.detail.file)"
+                            @receipt-cleared="clearOcrData()">
                             @csrf
                             <input type="hidden" name="type" :value="type">
+                            <input type="hidden" name="ocr_data" :value="ocrDataRaw">
 
                             <div class="sm:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">Receipt Image</label>
 
                                 <div x-data="receiptUploader()" class="mt-2">
                                     <!-- input asli (disembunyikan) -->
-                                    <input x-ref="file" type="file" name="receipt" accept="image/*" class="sr-only"
+                                    <input x-ref="file" type="file" name="receipt"
+                                        accept=".jpg, .jpeg, .png, .webp, .heic, .heif" class="sr-only"
                                         @change="fileChosen">
 
                                     <!-- Placeholder / Dropzone -->
@@ -63,7 +66,8 @@
                                                         Choose image or drag and drop here
                                                     </span>
                                                 </p>
-                                                <p class="mt-1 text-xs text-gray-500">Format: JPG/PNG/JPEG/WEBP · Maks 10MB
+                                                <p class="mt-1 text-xs text-gray-500">Format: JPG/PNG/JPEG/WEBP · Maks
+                                                    10MB
                                                 </p>
 
                                                 <span
@@ -100,11 +104,11 @@
                                             <div class="flex items-center gap-2">
                                                 <button type="button" @click="$refs.file.click()"
                                                     class="rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-900 shadow hover:bg-white">
-                                                    Ganti
+                                                    Change
                                                 </button>
                                                 <button type="button" @click="remove()"
                                                     class="rounded-lg bg-red-600/90 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-red-600">
-                                                    Hapus
+                                                    Remove
                                                 </button>
                                             </div>
                                         </div>
@@ -131,16 +135,17 @@
 
                                 <div>
                                     <x-input-label for="date" value="Date" />
-                                    <x-text-input id="date" type="date" name="date"
-                                        class="block w-full mt-1" :value="old('date', now()->toDateString())" required />
+                                    <x-text-input id="date" type="date" name="date" class="block w-full mt-1"
+                                        :value="old('date', now()->toDateString())" required />
                                     <x-input-error :messages="$errors->get('date')" class="mt-2" />
                                 </div>
 
                                 <div>
-                                    <x-input-label for="amount" value="Amount" />
-                                    <x-text-input id="amount" type="number" name="amount" step="0.01"
-                                        class="block w-full mt-1" placeholder="Rp."
-                                        x-effect="if (items.length) $el.value = itemsTotal" />
+                                    <x-input-label for="amount_display" value="Amount" />
+                                    <input type="hidden" name="amount" :value="parseRawAmount(amountFormatted)">
+                                    <x-text-input id="amount_display" type="text" class="block w-full mt-1"
+                                        placeholder="Rp 0" x-model="amountFormatted"
+                                        @input="handleAmountInput($event)" />
                                     <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                                 </div>
                             </div>
@@ -154,11 +159,12 @@
 
                             <div>
                                 <x-input-label for="note" value="Detail (optional)" />
-                                <x-textarea id="note" type="text" name="note" class="block w-full mt-1"></x-textarea>
+                                <x-textarea id="note" type="text" name="note"
+                                    class="block w-full mt-1"></x-textarea>
                                 <x-input-error :messages="$errors->get('note')" class="mt-2" />
                             </div>
 
-                            <div class="pt-4 border-t border-gray-100">
+                            <div class="pt-4 border-t border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h3 class="text-sm font-semibold text-green-800">Item</h3>
                                     <button x-show="items.length === 0" type="button" @click="addItem()"
@@ -171,7 +177,8 @@
                                     <div class="">
                                         <div class="grid grid-cols-1 gap-3 md:grid-cols-12">
                                             <div class="md:col-span-6">
-                                                <label class="block text-xs font-medium text-gray-600">Item Name</label>
+                                                <label class="block text-xs font-medium text-gray-600">Item
+                                                    Name</label>
                                                 <input :name="`items[${idx}][item_name]`" x-model="it.item_name"
                                                     placeholder="Enter item name"
                                                     class="block w-full px-3 py-2 mt-1 border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-xl">
@@ -184,8 +191,10 @@
                                             </div>
                                             <div class="md:col-span-3">
                                                 <label class="block text-xs font-medium text-gray-600">Price</label>
-                                                <input type="number" step="0.01" :name="`items[${idx}][price]`"
-                                                    x-model.number="it.price" placeholder="Rp."
+                                                <input type="hidden" :name="`items[${idx}][price]`" :value="it.price">
+                                                <input type="text" x-model="it.priceFormatted"
+                                                    @input="formatItemPrice(idx, $event.target.value)"
+                                                    placeholder="Rp 0"
                                                     class="block w-full px-3 py-2 mt-1 border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-xl">
                                             </div>
                                             <div class="flex items-end md:col-span-1">
@@ -195,15 +204,17 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <hr x-show="idx !== items.length - 1" class="w-full my-3 border-gray-200">
-                                    </div>
+                                        <div x-show="idx !== items.length - 1"
+                                            class="w-full my-3 border-t border-gray-200">
+                                        </div>
                                 </template>
 
-                                <div x-show="items.length > 0" x-cloak class="flex items-center justify-between w-full mt-3">
-                                    <span class="text-xs fw-bold">Total: Rp<span x-text="itemsTotal"></span></span>
+                                <div x-show="items.length > 0" x-cloak
+                                    class="flex items-center justify-between w-full mt-3">
+                                    <span class="text-xs fw-bold">Total: <span x-text="itemsTotal"></span></span>
                                     <button type="button" @click="addItem()"
-                                            class="rounded-10 btn btn-sm btn-outline-success">
-                                            + Add Item
+                                        class="rounded-10 btn btn-sm btn-outline-success">
+                                        + Add Item
                                     </button>
                                 </div>
                             </div>
@@ -235,14 +246,44 @@
                         category_id: init.oldCategoryId || '',
                         items: [],
                         previewUrl: null,
+                        ocrDataRaw: '',
 
                         get filteredCats() {
                             return this.categories.filter(c => c.type === this.type);
                         },
 
-                        get itemsTotal() {
+                        // IDR Currency
+                        amountFormatted: '',
+
+                        formatRupiah(num) {
+                            if (num === null || num === undefined || num === '') return '';
+                            const numeric = String(num).replace(/[^0-9]/g, '');
+                            return numeric ? 'Rp ' + new Intl.NumberFormat('id-ID').format(numeric) : '';
+                        },
+
+                        formatItemPrice(idx, value) {
+                            const raw = this.parseRawAmount(value);
+                            this.items[idx].price = raw;
+                            this.items[idx].priceFormatted = raw ? this.formatRupiah(raw) : '';
+                        },
+
+                        parseRawAmount(val) {
+                            if (!val) return 0;
+                            return Number(String(val).replace(/[^0-9]/g, '')) || 0;
+                        },
+
+                        get itemsTotalRaw() {
                             return this.items.reduce((sum, it) =>
                                 sum + ((Number(it.qty) || 0) * (Number(it.price) || 0)), 0);
+                        },
+
+                        get itemsTotal() {
+                            return this.formatRupiah(this.itemsTotalRaw);
+                        },
+
+                        handleAmountInput(e) {
+                            const raw = this.parseRawAmount(e.target.value);
+                            this.amountFormatted = raw ? this.formatRupiah(raw) : '';
                         },
 
                         init() {
@@ -250,6 +291,11 @@
                             this.$watch('type', () => {
                                 if (!this.filteredCats.find(c => String(c.id) === String(this.category_id))) {
                                     this.category_id = this.filteredCats[0]?.id ?? '';
+                                }
+                            });
+                            this.$watch('itemsTotalRaw', (newVal) => {
+                                if (this.items.length > 0) {
+                                    this.amountFormatted = this.formatRupiah(newVal);
                                 }
                             });
                             // Inisialisasi awal
@@ -262,11 +308,28 @@
                             this.items.push({
                                 item_name: '',
                                 qty: 1,
-                                price: null
+                                price: null,
+                                priceFormatted: ''
                             });
                         },
                         removeItem(i) {
                             this.items.splice(i, 1);
+                        },
+                        clearOcrData() {
+                            this.items = [];
+                            this.ocrDataRaw = '';
+                            this.amountFormatted = '';
+
+                            const amountInput = document.getElementById('amount');
+                            if (amountInput) {
+                                amountInput.value = '';
+                            }
+
+                            const statusEl = document.getElementById('strukStatus');
+                            if (statusEl) {
+                                statusEl.textContent = '';
+                                statusEl.className = 'mt-2 text-sm';
+                            }
                         },
                         async autoParseReceipt(file) {
                             if (!file) return;
@@ -303,11 +366,17 @@
                                     throw new Error(json.error || 'Failed to parse receipt.');
                                 }
 
-                                const parsed = (json.data.items || []).map(it => ({
-                                    item_name: it.item_name ?? '',
-                                    qty: it.qty ?? 1,
-                                    price: it.price ?? 0
-                                }));
+                                this.ocrDataRaw = JSON.stringify(json.data);
+
+                                const parsed = (json.data.items || []).map(it => {
+                                    const rawPrice = it.price ?? 0;
+                                    return {
+                                        item_name: it.item_name ?? '',
+                                        qty: it.qty ?? 1,
+                                        price: rawPrice,
+                                        priceFormatted: rawPrice ? this.formatRupiah(rawPrice) : ''
+                                    };
+                                });
 
                                 this.items = parsed.length ? parsed : [{
                                     item_name: '',
@@ -365,7 +434,9 @@
                             this.previewUrl = URL.createObjectURL(file);
 
                             // beri tahu form induk supaya parser AI langsung jalan otomatis
-                            this.$dispatch('receipt-selected', { file });
+                            this.$dispatch('receipt-selected', {
+                                file
+                            });
                         },
                         prettySize() {
                             if (!this.fileSize) return '';
@@ -380,6 +451,7 @@
                             this.fileName = '';
                             this.fileSize = 0;
                             if (this.$refs.file) this.$refs.file.value = '';
+                            this.$dispatch('receipt-cleared');
                         }
                     }
                 }

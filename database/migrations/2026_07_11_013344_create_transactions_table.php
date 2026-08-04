@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('title', 100);
             $table->text('note')->nullable();
             $table->date('date');
-            $table->string('image')->nullable();
+            $table->string('receipt')->nullable();
             $table->json('ocr_data')->nullable();
             $table->timestamps();
         });

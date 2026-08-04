@@ -18,8 +18,12 @@ class Transaction extends Model
         'title',
         'note',
         'date',
-        'image',
+        'receipt',
         'ocr_data',
+    ];
+
+    protected $casts = [
+        'ocr_data' => 'array',
     ];
 
     public function user()
