@@ -21,8 +21,8 @@
                 </span>
             </a>
         </li>
-        <li class="list">
-            <a href="" title="Transactions">
+        <li class="list {{ request()->routeIs('transactions.index') ? 'active' : '' }}">
+            <a href="{{ route('transactions.index') }}" title="Transactions">
                 <span class="icon">
                     <i class='bx bx-history icon'></i>
                 </span>

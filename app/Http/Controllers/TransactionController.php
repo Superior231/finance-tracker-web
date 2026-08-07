@@ -14,22 +14,32 @@ use Illuminate\Validation\Rule;
 
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with('category', 'items')
-            ->where('user_id', Auth::user()->id)
-            ->latest()->paginate(12);
+        $query = Transaction::with(['category', 'items'])
+            ->where('user_id', Auth::id());
 
-        $totalMonthly = Transaction::whereMonth('date', now()->month)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+        }
+
+        $transactions = $query->latest()->get();
+
+        $totalMonthly = Transaction::where('user_id', Auth::id())
+            ->whereMonth('date', now()->month)
             ->whereYear('date', now()->year)
             ->sum('amount');
 
-        return view('pages.transaction.index', compact('transactions', 'totalMonthly'));
+        return view('pages.transaction.index', [
+            'transactions' => $transactions,
+            'totalMonthly' => $totalMonthly,
+            'title' => 'Transactions - Finance Tracker',
+            'navTitle' => 'Transactions'
+        ]);
     }
 
     public function create()
     {
-        $transactions = Transaction::all();
         $categories = Category::select(['id', 'name', 'type'])
                             ->where('user_id', Auth::id())
                             ->orderBy('name')->get();
@@ -39,8 +49,7 @@ class TransactionController extends Controller
             'categories' => $categories,
             'defaultType' => $defaultType,
             'title' => 'Create Transaction - Finance Tracker',
-            'navTitle' => 'Create Transaction',
-            'transactions' => $transactions
+            'navTitle' => 'Create Transaction'
         ]);
     }
 
@@ -124,14 +133,13 @@ class TransactionController extends Controller
                             'item_name'      => $it['item_name'],
                             'qty'            => $it['qty'] ?? 1,
                             'price'          => $it['price'] ?? 0,
-                            'subtotal'       => ($it['qty'] ?? 1) * ($it['price'] ?? 0),
                         ]);
                     }
                 }
             }
         });
 
-        return redirect()->route('transactions.create')->with('success', 'Transaction created successfully!');
+        return redirect()->route('transactions.index')->with('success', 'Transaction created successfully!');
     }
 
     public function show(Transaction $transaction)
@@ -145,5 +153,108 @@ class TransactionController extends Controller
         return view('transactions.show', [
             'tx' => $transaction,
         ]);
+    }
+
+    public function edit(Transaction $transaction)
+    {
+        if ($transaction->user_id !== Auth::user()->id) {
+            return redirect()->route('transactions.index')->with('error', 'Oops... Something went wrong!');
+        }
+
+        $categories = Category::select(['id', 'name', 'type'])
+                            ->where('user_id', Auth::id())
+                            ->orderBy('name')->get();
+
+        return view('pages.transactions.edit', [
+            'transaction' => $transaction,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function update(Request $request, Transaction $transaction)
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:income,expense',
+            'category_id' => [
+                'required',
+                Rule::exists('categories', 'id')->where('user_id', Auth::id()),
+            ],
+            'date' => 'required|date',
+            'amount' => 'required|numeric',
+            'title' => 'required|string|max:100',
+            'note' => 'nullable|string',
+            'items.*.item_name' => 'nullable|string',
+            'items.*.qty' => 'nullable|numeric',
+            'items.*.price' => 'nullable|numeric',
+            'receipt' => 'nullable|image|mimes:jpg,jpeg,png,webp,heic,heif|max:10048',
+            'ocr_data' => 'nullable|json',
+        ]);
+
+        $catType = Category::where('id', $validated['category_id'])->value('type');
+        if ($catType !== $validated['type']) {
+            return back()->withInput()->withErrors(['category_id' => 'The selected category does not match the transaction type!']);
+        }
+
+        DB::transaction(function () use ($transaction, $validated, $request) {
+            $receiptName = null;
+            if ($request->hasFile('receipt')) {
+                $file = $request->file('receipt');
+                $receiptName = time() . '_' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.webp';
+                
+                $image = Image::make($file)->resize(1200, 1200, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->encode('webp', 80);
+
+                Storage::disk('public')->put('receipts/' . $receiptName, (string) $image);
+            }
+
+            $ocrData = !empty($validated['ocr_data']) ? json_decode($validated['ocr_data'], true) : null;
+
+            $transaction->update([
+                'category_id' => $validated['category_id'],
+                'title'       => $validated['title'],
+                'type'        => $validated['type'],
+                'date'        => $validated['date'],
+                'amount'      => $validated['amount'],
+                'note'        => $validated['note'] ?? null,
+                'receipt'     => $receiptName,
+                'ocr_data'    => $ocrData,
+            ]);
+
+            if (!empty($validated['items'])) {
+                foreach ($validated['items'] as $it) {
+                    if (!empty($it['item_name'])) {
+                        Item::create([
+                            'transaction_id' => $transaction->id,
+                            'item_name'      => $it['item_name'],
+                            'qty'            => $it['qty'] ?? 1,
+                            'price'          => $it['price'] ?? 0,
+                        ]);
+                    }
+                }
+            }
+
+            if (!empty($transaction->receipt) && $transaction->receipt !== $receiptName) {
+                Storage::disk('public')->delete('receipts/' . $transaction->receipt);
+            }
+        });
+
+        return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully!');
+    }
+
+    public function destroy(Transaction $transaction)
+    {
+        if ($transaction->user_id !== Auth::user()->id) {
+            return redirect()->route('transactions.index')->with('error', 'Oops... Something went wrong!');
+        }
+
+        if (!empty($transaction->receipt)) {
+            Storage::disk('public')->delete('receipts/' . $transaction->receipt);
+        }
+
+        $transaction->delete();
+
+        return redirect()->route('transactions.index')->with('success', 'Transaction deleted successfully!');
     }
 }

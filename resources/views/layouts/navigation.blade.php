@@ -31,7 +31,7 @@
                     <div class="{{ $classes }}">
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
-                                <button class="flex items-center focus:outline-none">
+                                <button class="flex items-center py-3 focus:outline-none">
                                     <div>{{ __('Transactions') }}</div>
 
                                     <div class="ms-1">
@@ -43,11 +43,11 @@
                             </x-slot>
 
                             <x-slot name="content">
-                                <x-dropdown-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')">
-                                    {{ __('Create Transaction') }}
-                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')">
                                     {{ __('All Transactions') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')">
+                                    {{ __('Create Transaction') }}
                                 </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
