@@ -165,9 +165,11 @@ class TransactionController extends Controller
                             ->where('user_id', Auth::id())
                             ->orderBy('name')->get();
 
-        return view('pages.transactions.edit', [
+        return view('pages.transaction.edit', [
             'transaction' => $transaction,
             'categories' => $categories,
+            'title' => 'Edit Transaction - Finance Tracker',
+            'navTitle' => 'Edit Transaction',
         ]);
     }
 
@@ -188,7 +190,32 @@ class TransactionController extends Controller
             'items.*.price' => 'nullable|numeric',
             'receipt' => 'nullable|image|mimes:jpg,jpeg,png,webp,heic,heif|max:10048',
             'ocr_data' => 'nullable|json',
+            'remove_receipt' => 'nullable|boolean',
+        ], [
+            'type.required' => 'The transaction type is required.',
+            'type.in' => 'The selected transaction type is invalid.',
+            'category_id.required' => 'The category is required.',
+            'category_id.exists' => 'The selected category was not found.',
+            'date.required' => 'The date is required.',
+            'date.date' => 'The date must be a valid date.',
+            'amount.required' => 'The amount is required.',
+            'amount.numeric' => 'The amount must be a number.',
+            'title.required' => 'The title is required.',
+            'title.string' => 'The title must be a string.',
+            'title.max' => 'The title may not be greater than 100 characters.',
+            'note.string' => 'The note must be a string.',
+            'items.*.item_name.string' => 'The item name must be a string.',
+            'items.*.qty.numeric' => 'The item quantity must be a number.',
+            'items.*.price.numeric' => 'The item price must be a number.',
+            'receipt.image' => 'The receipt must be an image.',
+            'receipt.mimes' => 'The receipt must be a file of type: jpg, jpeg, png, webp, heic, heif.',
+            'receipt.max' => 'The receipt may not be greater than 10MB.',
+            'ocr_data.json' => 'The OCR data must be a valid JSON.',
         ]);
+
+        if ($transaction->user_id !== Auth::user()->id) {
+            return redirect()->route('transactions.index')->with('error', 'Oops... Something went wrong!');
+        }
 
         $catType = Category::where('id', $validated['category_id'])->value('type');
         if ($catType !== $validated['type']) {
@@ -196,47 +223,64 @@ class TransactionController extends Controller
         }
 
         DB::transaction(function () use ($transaction, $validated, $request) {
-            $receiptName = null;
+            $oldReceipt = $transaction->receipt;
+            $receiptName = $oldReceipt;
+            $hasNewReceipt = false;
+            $wantsRemoveReceipt = $request->boolean('remove_receipt');
+
             if ($request->hasFile('receipt')) {
                 $file = $request->file('receipt');
                 $receiptName = time() . '_' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.webp';
-                
-                $image = Image::make($file)->resize(1200, 1200, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })->encode('webp', 80);
-
+                $image = Image::make($file)
+                    ->resize(1200, 1200, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })
+                    ->encode('webp', 80);
                 Storage::disk('public')->put('receipts/' . $receiptName, (string) $image);
+                $hasNewReceipt = true;
             }
 
-            $ocrData = !empty($validated['ocr_data']) ? json_decode($validated['ocr_data'], true) : null;
-
-            $transaction->update([
+            $updateData = [
                 'category_id' => $validated['category_id'],
                 'title'       => $validated['title'],
                 'type'        => $validated['type'],
                 'date'        => $validated['date'],
                 'amount'      => $validated['amount'],
                 'note'        => $validated['note'] ?? null,
-                'receipt'     => $receiptName,
-                'ocr_data'    => $ocrData,
-            ]);
+            ];
 
-            if (!empty($validated['items'])) {
-                foreach ($validated['items'] as $it) {
-                    if (!empty($it['item_name'])) {
-                        Item::create([
-                            'transaction_id' => $transaction->id,
-                            'item_name'      => $it['item_name'],
-                            'qty'            => $it['qty'] ?? 1,
-                            'price'          => $it['price'] ?? 0,
-                        ]);
-                    }
+            // FIX: ocr_data hanya ditimpa kalau memang ada data baru dikirim
+            // (mencegah data OCR lama hilang saat edit transaksi tanpa ganti struk)
+            if (!empty($validated['ocr_data'])) {
+                $updateData['ocr_data'] = json_decode($validated['ocr_data'], true);
+            }
+
+            if ($hasNewReceipt) {
+                $updateData['receipt'] = $receiptName;
+            } elseif ($wantsRemoveReceipt) {
+                // FIX: handle penghapusan struk yang sebelumnya tidak diproses sama sekali
+                $updateData['receipt'] = null;
+                $updateData['ocr_data'] = null;
+            }
+
+            $transaction->update($updateData);
+            Item::where('transaction_id', $transaction->id)->delete();
+
+            foreach ($validated['items'] ?? [] as $it) {
+                if (!empty($it['item_name'])) {
+                    Item::create([
+                        'transaction_id' => $transaction->id,
+                        'item_name'      => $it['item_name'],
+                        'qty'            => $it['qty'] ?? 1,
+                        'price'          => $it['price'] ?? 0,
+                    ]);
                 }
             }
 
-            if (!empty($transaction->receipt) && $transaction->receipt !== $receiptName) {
-                Storage::disk('public')->delete('receipts/' . $transaction->receipt);
+            // Hapus file lama dari storage kalau diganti ATAU dihapus
+            if (($hasNewReceipt || $wantsRemoveReceipt) && !empty($oldReceipt)) {
+                Storage::disk('public')->delete('receipts/' . $oldReceipt);
             }
         });
 

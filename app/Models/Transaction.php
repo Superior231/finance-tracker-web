@@ -23,6 +23,7 @@ class Transaction extends Model
     ];
 
     protected $casts = [
+        'date' => 'date',
         'ocr_data' => 'array',
     ];
 
