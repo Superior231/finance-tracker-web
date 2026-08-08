@@ -207,6 +207,7 @@
                                         <div x-show="idx !== items.length - 1"
                                             class="w-full my-3 border-t border-gray-200">
                                         </div>
+                                    </div>
                                 </template>
 
                                 <div x-show="items.length > 0" x-cloak
