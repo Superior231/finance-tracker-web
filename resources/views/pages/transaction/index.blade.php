@@ -66,7 +66,7 @@
                             @foreach ($transactions as $transaction)
                                 <tr class="align-middle">
                                     <td>
-                                        <div class="position-relative d-flex justify-content-center me-3">
+                                        <div class="position-relative d-flex justify-content-center">
                                             <div class="image d-flex justify-content-center" style="cursor: pointer;"
                                                 data-bs-toggle="modal" data-bs-target="#showImageModal"
                                                 onclick="showImage('{{ $transaction->receipt }}')">
@@ -126,7 +126,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="actions d-flex justify-content-center pe-3">
+                                        <div class="actions d-flex justify-content-center">
                                             <div class="dropdown">
                                                 <i class="bx bx-dots-vertical-rounded fs-4"
                                                     id="action-{{ $transaction->id }}" data-bs-toggle="dropdown"
